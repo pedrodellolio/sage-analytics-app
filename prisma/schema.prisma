@@ -1,0 +1,80 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+// Looking for ways to speed up your queries, or scale easily with your serverless or edge functions?
+// Try Prisma Accelerate: https://pris.ly/cli/accelerate-init
+
+generator client {
+  provider = "prisma-client-js"
+  output   = "../generated/prisma"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+enum TransactionType {
+  EXPENSE
+  INCOME
+}
+
+model User {
+  id            String    @id @default(cuid())
+  firstName     String
+  lastName      String
+  passwordHash  String
+  email         String    @unique
+  emailVerified DateTime?
+  createdAt     DateTime  @default(now())
+  updatedAt     DateTime  @updatedAt
+
+  wallets       Wallet[]
+  labels        Label[]
+  refreshTokens RefreshToken[]
+}
+
+model RefreshToken {
+  id        String   @id @default(uuid())
+  token     String   @unique
+  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  userId    String
+  createdAt DateTime @default(now())
+  revoked   Boolean  @default(false)
+}
+
+model Wallet {
+  id          String  @id @default(cuid())
+  userId      String
+  month       Int
+  year        Int
+  expensesBrl Decimal
+  incomeBrl   Decimal
+
+  user        User          @relation(fields: [userId], references: [id])
+  Transaction Transaction[]
+}
+
+model Transaction {
+  id         String          @id @default(cuid())
+  walletId   String
+  title      String
+  valueBrl   Decimal
+  type       TransactionType
+  createdAt  DateTime        @default(now())
+  occurredAt DateTime        @default(now())
+
+  wallet Wallet  @relation(fields: [walletId], references: [id])
+  labels Label[]
+}
+
+model Label {
+  id           String        @id @default(cuid())
+  userId       String
+  title        String        @unique
+  colorHex     String
+  isActive     Boolean
+  createdAt    DateTime      @default(now())
+  user         User          @relation(fields: [userId], references: [id])
+  transactions Transaction[]
+}

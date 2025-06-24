@@ -18,6 +18,6 @@ app.use((err: any, req: any, res: any, next: any) => {
   res.status(500).json({ error: "Erro interno no servidor" });
 });
 
-app.listen(config.port, () => {
+app.listen(config.port, "0.0.0.0", () => {
   console.log(`Example app listening on port ${config.port}`);
 });

@@ -1,20 +1,25 @@
-1. Setup `.env`
+# Sage Analytics
 
-- POSTGRES_USER
-- POSTGRES_PASSWORD
-- POSTGRES_DB
-- POSTGRES_PORT
-- DATABASE_URL
-- SERVER_PORT
-- JWT_SECRET_KEY
-- JWT_EXPIRES
-- JWT_AUDIENCE
-- JWT_ISSUER
+### Setup `.env.prod` and `.env.local`:
 
-2. Run Docker Compose
+```
+POSTGRES_USER=
+POSTGRES_PASSWORD=
+POSTGRES_DB=
+POSTGRES_PORT=
+DATABASE_URL=
+SERVER_PORT=
+JWT_SECRET_KEY=
+JWT_EXPIRES=
+JWT_AUDIENCE=
+JWT_ISSUER=
+```
 
+### Run Container
+
+`npm run build`
 `docker compose -f docker-compose.yml up --build -d`
 
-3. Test
+### Test
 
 `curl localhost:{SERVER_PORT}`

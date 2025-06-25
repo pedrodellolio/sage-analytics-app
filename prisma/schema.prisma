@@ -48,8 +48,8 @@ model Wallet {
   userId      String
   month       Int
   year        Int
-  expensesBrl Decimal
-  incomeBrl   Decimal
+  expensesBrl Decimal @default(0)
+  incomeBrl   Decimal @default(0)
 
   user        User          @relation(fields: [userId], references: [id])
   Transaction Transaction[]

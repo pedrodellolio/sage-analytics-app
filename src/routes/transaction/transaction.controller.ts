@@ -1,6 +1,8 @@
 import { Router, Request, Response, NextFunction } from "express";
-import { getTransactions, postTransactions } from "./transaction.service";
+import { getTransactions, postTransaction } from "./transaction.service";
 import { CreateTransactionDto } from "./dto/create-transaction.dto";
+import { importTransactions } from "./transaction.import";
+import { upload } from "../../libs/multer";
 
 const transactionRouter = Router();
 
@@ -24,7 +26,7 @@ transactionRouter.get(
 );
 
 /**
- * Get user's transactions
+ * Create user's transaction
  * @auth required
  * @route {POST} /transaction
  */
@@ -43,7 +45,7 @@ transactionRouter.post(
     }
 
     try {
-      const transactions = await postTransactions({
+      const transactions = await postTransaction({
         ...parseResult.data,
         userId: user.id,
       });
@@ -54,5 +56,12 @@ transactionRouter.post(
     }
   }
 );
+
+/**
+ * Create transactions from CSV imported file
+ * @auth required
+ * @route {POST} /transaction
+ */
+transactionRouter.post("/import", upload.single("file"), importTransactions);
 
 export default transactionRouter;

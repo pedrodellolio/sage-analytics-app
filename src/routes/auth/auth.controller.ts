@@ -1,4 +1,10 @@
-import { Router, Request, Response, NextFunction } from "express";
+import {
+  Router,
+  Request,
+  Response,
+  NextFunction,
+  CookieOptions,
+} from "express";
 import { LoginDto } from "./dto/login.dto";
 import { RegisterDto } from "./dto/register.dto";
 import { RefreshTokenDto } from "./dto/refresh-token.dto";
@@ -19,6 +25,15 @@ function _signAccessToken(userId: string) {
     audience: config.audience,
   });
 }
+
+const COOKIE_PATH = "/api/auth/refresh";
+const COOKIE_CONFIG: CookieOptions = {
+  httpOnly: true,
+  secure: config.nodeEnv === "production",
+  sameSite: "strict",
+  path: COOKIE_PATH,
+  maxAge: 7 * 24 * 60 * 60 * 1000,
+};
 
 /**
  * Create a new user
@@ -76,21 +91,15 @@ authRouter.post(
       const refreshToken = jwt.sign({ sub: user.id }, config.secretKey, {
         algorithm: "HS256",
         expiresIn: "7d",
-        // issuer: config.issuer,
-        // audience: config.audience,
+        issuer: config.issuer,
+        audience: config.audience,
       });
 
       await prisma.refreshToken.create({
         data: { token: refreshToken, userId: user.id },
       });
 
-      res.cookie("refreshToken", refreshToken, {
-        httpOnly: true,
-        secure: config.nodeEnv === "production",
-        sameSite: "strict",
-        path: "/auth/refresh",
-        maxAge: 7 * 24 * 60 * 60 * 1000,
-      });
+      res.cookie("refreshToken", refreshToken, COOKIE_CONFIG);
 
       res.json({ accessToken });
     } catch (err) {
@@ -111,9 +120,10 @@ authRouter.post(
  */
 authRouter.post(
   "/refresh",
-  passport.authenticate("jwt", { session: false }),
+  // passport.authenticate("jwt", { session: false }),
   async (req: Request, res: Response, next: NextFunction) => {
     try {
+      console.log(req.cookies);
       const { refreshToken } = RefreshTokenDto.parse(req.cookies);
 
       // Verify if token is valid
@@ -125,7 +135,7 @@ authRouter.post(
           audience: config.audience,
         }) as { sub: string };
       } catch {
-        res.clearCookie("refreshToken", { path: "/auth/refresh" });
+        res.clearCookie("refreshToken", { path: COOKIE_PATH });
         res.status(401).json({ error: "Refresh token inválido ou expirado" });
         return;
       }
@@ -135,7 +145,7 @@ authRouter.post(
         where: { token: refreshToken },
       });
       if (!stored || stored.revoked) {
-        res.clearCookie("refreshToken", { path: "/auth/refresh" });
+        res.clearCookie("refreshToken", { path: COOKIE_PATH });
         res.status(401).json({ error: "Refresh token inválido ou revogado" });
         return;
       }
@@ -158,14 +168,7 @@ authRouter.post(
         data: { token: newRefreshToken, userId: payload.sub },
       });
 
-      res.cookie("refreshToken", newRefreshToken, {
-        httpOnly: true,
-        secure: true,
-        sameSite: "strict",
-        path: "/auth/refresh",
-        maxAge: 7 * 24 * 60 * 60 * 1000,
-      });
-
+      res.cookie("refreshToken", newRefreshToken, COOKIE_CONFIG);
       res.json({ accessToken: newAccessToken });
     } catch (err) {
       if (err instanceof z.ZodError) {
@@ -195,7 +198,7 @@ authRouter.post(
           data: { revoked: true },
         });
       }
-      res.clearCookie("refreshToken", { path: "/auth/refresh" });
+      res.clearCookie("refreshToken", { path: COOKIE_PATH });
       res.status(204).send();
     } catch (err) {
       if (err instanceof z.ZodError) {

@@ -26,9 +26,7 @@ passport.use(
   "jwt",
   new JwtStrategy(opts, async (payload, done) => {
     const { sub, expiration } = payload;
-
-    if (Date.now() > expiration) done("Unauthorized", false);
-
+    // if (Date.now() > expiration) done("Unauthorized", false);
     const user = await prisma.user.findUnique({ where: { id: sub } });
     return user ? done(null, user) : done(null, false);
   })

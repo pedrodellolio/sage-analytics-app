@@ -22,8 +22,8 @@ app.use(passport.initialize());
 configureRouting(app);
 
 app.use((err: any, req: any, res: any, next: any) => {
-  console.error("Erro não tratado:", err);
-  res.status(500).json({ error: "Erro interno no servidor" });
+  console.error("Error:", err);
+  res.status(500).json({ error: "Internal Error" });
 });
 
 app.listen(config.port, "0.0.0.0", () => {

@@ -48,8 +48,8 @@ model Wallet {
   userId      String
   month       Int
   year        Int
-  expensesBrl Decimal @default(0)
-  incomeBrl   Decimal @default(0)
+  expensesBrl Decimal @default(0) @db.Decimal(10, 2)
+  incomeBrl   Decimal @default(0) @db.Decimal(10, 2)
 
   user        User          @relation(fields: [userId], references: [id])
   Transaction Transaction[]
@@ -59,7 +59,7 @@ model Transaction {
   id         String          @id @default(cuid())
   walletId   String
   title      String
-  valueBrl   Decimal
+  valueBrl   Decimal         @default(0) @db.Decimal(10, 2)
   type       TransactionType
   createdAt  DateTime        @default(now())
   occurredAt DateTime        @default(now())

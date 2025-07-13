@@ -50,7 +50,7 @@ authRouter.post(
 
       const exists = await prisma.user.findUnique({ where: { email } });
       if (exists) {
-        res.status(409).json({ error: "Email já está em uso" });
+        res.status(409).json({ error: "Email already in use" });
         return;
       }
 
@@ -61,7 +61,7 @@ authRouter.post(
       res.status(201).json({ id: user.id, email: user.email });
     } catch (err) {
       if (err instanceof z.ZodError) {
-        res.status(400).json({ error: "Dados inválidos", details: err.errors });
+        res.status(400).json({ error: "Invalid data", details: err.errors });
       } else {
         console.error("Login error:", err);
         next(err);
@@ -83,7 +83,7 @@ authRouter.post(
 
       const user = await prisma.user.findUnique({ where: { email } });
       if (!user || !(await bcrypt.compare(password, user.passwordHash))) {
-        res.status(401).json({ error: "Credenciais inválidas" });
+        res.status(401).json({ error: "Invalid credentials" });
         return;
       }
 
@@ -104,7 +104,7 @@ authRouter.post(
       res.json({ accessToken });
     } catch (err) {
       if (err instanceof z.ZodError) {
-        res.status(400).json({ error: "Dados inválidos", details: err.errors });
+        res.status(400).json({ error: "Invalid data", details: err.errors });
       } else {
         console.error("Login error:", err);
         next(err);
@@ -136,7 +136,7 @@ authRouter.post(
         }) as { sub: string };
       } catch {
         res.clearCookie("refreshToken", { path: COOKIE_PATH });
-        res.status(401).json({ error: "Refresh token inválido ou expirado" });
+        res.status(401).json({ error: "Refresh token is invalid/expired" });
         return;
       }
 
@@ -146,7 +146,7 @@ authRouter.post(
       });
       if (!stored || stored.revoked) {
         res.clearCookie("refreshToken", { path: COOKIE_PATH });
-        res.status(401).json({ error: "Refresh token inválido ou revogado" });
+        res.status(401).json({ error: "Refresh token is invalid/revoked" });
         return;
       }
 
@@ -172,7 +172,7 @@ authRouter.post(
       res.json({ accessToken: newAccessToken });
     } catch (err) {
       if (err instanceof z.ZodError) {
-        res.status(400).json({ error: "Dados inválidos", details: err.errors });
+        res.status(400).json({ error: "Invalid data", details: err.errors });
       } else {
         console.error("Refresh token error:", err);
         next(err);
@@ -202,7 +202,7 @@ authRouter.post(
       res.status(204).send();
     } catch (err) {
       if (err instanceof z.ZodError) {
-        res.status(400).json({ error: "Dados inválidos", details: err.errors });
+        res.status(400).json({ error: "Invalid data", details: err.errors });
       } else {
         console.error("Logout error:", err);
         next(err);

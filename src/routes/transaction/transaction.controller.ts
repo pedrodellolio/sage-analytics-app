@@ -1,6 +1,6 @@
 import { Router, Request, Response, NextFunction } from "express";
 import { getTransactions, postTransaction } from "./transaction.service";
-import { CreateTransactionDto } from "./dto/create-transaction.dto";
+import { CreateTransactionDto } from "./dtos/create-transaction.dto";
 import { importTransactions } from "./transaction.import";
 import { upload } from "../../libs/multer";
 
@@ -19,7 +19,7 @@ transactionRouter.get(
       const transactions = await getTransactions(user.id);
       res.status(200).json(transactions);
     } catch (err) {
-      console.error("Erro na rota protegida:", err);
+      console.error("Error:", err);
       next(err);
     }
   }
@@ -51,7 +51,7 @@ transactionRouter.post(
       });
       res.status(201).json(transactions);
     } catch (err) {
-      console.error("Erro na rota protegida:", err);
+      console.error("Error:", err);
       next(err);
     }
   }
@@ -62,6 +62,6 @@ transactionRouter.post(
  * @auth required
  * @route {POST} /transaction
  */
-transactionRouter.post("/import", upload.single("file"), importTransactions);
+transactionRouter.post("/import", upload.array("files"), importTransactions);
 
 export default transactionRouter;

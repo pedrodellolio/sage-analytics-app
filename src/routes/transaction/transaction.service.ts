@@ -1,7 +1,7 @@
 import { TransactionType } from "../../../generated/prisma";
 import prisma from "../../libs/prisma";
 import { ensureWallet } from "../wallet/wallet.service";
-import { CreateTransactionDtoType } from "./dto/create-transaction.dto";
+import { CreateTransactionDtoType } from "./dtos/create-transaction.dto";
 
 /**
  * Returns all user's transactions
@@ -13,8 +13,8 @@ export const getTransactions = async (userId: string) => {
       orderBy: { occurredAt: "desc" },
     });
   } catch (error) {
-    console.error("[getArticles] Error:", error);
-    throw new Error("Could not fetch articles");
+    console.error("[getTransactions] Error:", error);
+    throw new Error("Could not fetch Transactions");
   }
 };
 

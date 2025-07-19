@@ -5,7 +5,10 @@ export enum Bank {
   Nubank = "Nubank",
 }
 
-type ParserFn = (row: Record<string, string>) => CreateTransactionDtoType;
+type ParserFn = (
+  row: Record<string, string>,
+  userId: string
+) => Promise<CreateTransactionDtoType>;
 
 export const bankParsers: Record<Bank, ParserFn> = {
   [Bank.Nubank]: parseNubankTransactionRow,

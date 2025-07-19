@@ -4,6 +4,7 @@ import passport from "passport";
 import authRouter from "./auth/auth.controller";
 import userRouter from "./user/user.controller";
 import walletRouter from "./wallet/wallet.controller";
+import categoryRouter from "./category/category.controller";
 
 export const configureRouting = (app: Application) => {
   const router = Router();
@@ -13,6 +14,11 @@ export const configureRouting = (app: Application) => {
     "/transaction",
     passport.authenticate("jwt", { session: false }),
     transactionRouter
+  );
+  router.use(
+    "/category",
+    passport.authenticate("jwt", { session: false }),
+    categoryRouter
   );
   router.use(
     "/wallet",

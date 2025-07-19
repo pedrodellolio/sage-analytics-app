@@ -38,8 +38,8 @@ export const importTransactions = async (
         const stream = Readable.from(file.buffer);
         stream
           .pipe(csv())
-          .on("data", (row: Record<string, string>) => {
-            const parsed = parser(row);
+          .on("data", async (row: Record<string, string>) => {
+            const parsed = await parser(row, user.id);
             transactions.push(parsed);
           })
           .on("end", resolve)

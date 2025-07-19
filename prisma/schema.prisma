@@ -69,12 +69,21 @@ model Transaction {
 }
 
 model Label {
-  id           String        @id @default(cuid())
-  userId       String
-  title        String        @unique
-  colorHex     String
-  isActive     Boolean
-  createdAt    DateTime      @default(now())
-  user         User          @relation(fields: [userId], references: [id])
-  transactions Transaction[]
+  id            String          @id @default(cuid())
+  userId        String
+  title         String          @unique
+  colorHex      String
+  isActive      Boolean         @default(true)
+  createdAt     DateTime        @default(now())
+  user          User            @relation(fields: [userId], references: [id])
+  transactions  Transaction[]
+  LabelKeywords LabelKeywords[]
+}
+
+model LabelKeywords {
+  id        String   @id @default(cuid())
+  labelId   String
+  createdAt DateTime @default(now())
+  keyword   String   @unique
+  label     Label    @relation(fields: [labelId], references: [id])
 }

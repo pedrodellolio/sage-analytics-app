@@ -1,5 +1,6 @@
 import { TransactionType } from "../../../generated/prisma";
 import prisma from "../../libs/prisma";
+import { detectCategoryByKeyword } from "../category/category.service";
 import { ensureWallet } from "../wallet/wallet.service";
 import { CreateTransactionDtoType } from "./dtos/create-transaction.dto";
 
@@ -40,10 +41,9 @@ export const processTransactions = async (
 ) => {
   return prisma.$transaction(async (tx) => {
     const createdTxns = [];
-    for (const t of transactions) {
-      const ch = t as any; // ensure correct shape
+    for (const transaction of transactions) {
       const txn = await _createOneTransaction({
-        ...ch,
+        ...transaction,
         userId,
       });
       createdTxns.push(txn);
@@ -60,6 +60,7 @@ const _createOneTransaction = async (params: {
   valueBrl: number;
   type: TransactionType;
   occurredAt: Date;
+  categoryId?: string;
   userId: string;
 }) => {
   const { title, valueBrl, type, occurredAt, userId } = params;
@@ -72,6 +73,7 @@ const _createOneTransaction = async (params: {
       type,
       occurredAt,
       walletId: wallet.id,
+      labels: { connect: { id: params.categoryId } },
     },
   });
 

@@ -8,9 +8,7 @@ export const CreateTransactionDto = z.object({
   valueBrl: z.number().positive("Value must be greater than 0"),
   type: z.nativeEnum(TransactionType).default("EXPENSE"),
   occurredAt: z.coerce.date(),
+  categoryId: z.string().cuid("Category ID must be a valid CUID").optional(),
 });
 
-export type CreateTransactionWithWalletKey = CreateTransactionDtoType & {
-  walletKey: string;
-};
 export type CreateTransactionDtoType = z.infer<typeof CreateTransactionDto>;

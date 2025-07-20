@@ -52,20 +52,21 @@ model Wallet {
   incomeBrl   Decimal @default(0) @db.Decimal(10, 2)
 
   user        User          @relation(fields: [userId], references: [id])
-  Transaction Transaction[]
+  transaction Transaction[]
 }
 
 model Transaction {
   id         String          @id @default(cuid())
   walletId   String
+  labelId    String?
   title      String
   valueBrl   Decimal         @default(0) @db.Decimal(10, 2)
   type       TransactionType
   createdAt  DateTime        @default(now())
   occurredAt DateTime        @default(now())
 
-  wallet Wallet  @relation(fields: [walletId], references: [id])
-  labels Label[]
+  wallet Wallet @relation(fields: [walletId], references: [id])
+  label  Label? @relation(fields: [labelId], references: [id])
 }
 
 model Label {
@@ -76,8 +77,8 @@ model Label {
   isActive      Boolean         @default(true)
   createdAt     DateTime        @default(now())
   user          User            @relation(fields: [userId], references: [id])
-  transactions  Transaction[]
-  LabelKeywords LabelKeywords[]
+  labelKeywords LabelKeywords[]
+  transaction   Transaction[]
 }
 
 model LabelKeywords {

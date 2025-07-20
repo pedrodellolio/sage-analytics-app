@@ -123,7 +123,6 @@ authRouter.post(
   // passport.authenticate("jwt", { session: false }),
   async (req: Request, res: Response, next: NextFunction) => {
     try {
-      console.log(req.cookies);
       const { refreshToken } = RefreshTokenDto.parse(req.cookies);
 
       // Verify if token is valid

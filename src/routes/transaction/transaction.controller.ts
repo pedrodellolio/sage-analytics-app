@@ -1,8 +1,13 @@
 import { Router, Request, Response, NextFunction } from "express";
-import { getTransactions, postTransaction } from "./transaction.service";
+import {
+  getTransactions,
+  postTransaction,
+  updateTransactionCategory,
+} from "./transaction.service";
 import { CreateTransactionDto } from "./dtos/create-transaction.dto";
 import { importTransactions } from "./transaction.import";
 import { upload } from "../../libs/multer";
+import { UpdateTransactionCategoryDto } from "./dtos/update-transaction-category.dto";
 
 const transactionRouter = Router();
 
@@ -63,5 +68,37 @@ transactionRouter.post(
  * @route {POST} /transaction
  */
 transactionRouter.post("/import", upload.array("files"), importTransactions);
+
+/**
+ * Create user's transaction
+ * @auth required
+ * @route {POST} /transaction
+ */
+transactionRouter.put(
+  "/update-category",
+  async (req: Request, res: Response, next: NextFunction) => {
+    const user = (req as any).user;
+
+    const parseResult = UpdateTransactionCategoryDto.safeParse(req.body);
+    if (!parseResult.success) {
+      res.status(400).json({
+        message: "Validation error",
+        errors: parseResult.error.flatten().fieldErrors,
+      });
+      return;
+    }
+
+    try {
+      const transactions = await updateTransactionCategory(
+        parseResult.data.id,
+        parseResult.data.categoryId
+      );
+      res.status(201).json(transactions);
+    } catch (err) {
+      console.error("Error:", err);
+      next(err);
+    }
+  }
+);
 
 export default transactionRouter;

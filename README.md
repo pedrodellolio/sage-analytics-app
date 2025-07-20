@@ -20,6 +20,15 @@ JWT_ISSUER=
 `npm run build`
 `docker compose -f docker-compose.yml up --build -d`
 
+### Run commands inside Docker
+
+`docker compose run [SERVICE_NAME] [COMMAND]` like `docker compose run server npx prisma migrate dev`
+
+### Enter container shell
+
+`docker compose run --rm [SERVICE_NAME] sh`
+`exit`
+
 ### Test
 
 `curl localhost:{SERVER_PORT}`

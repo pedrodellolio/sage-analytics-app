@@ -1,5 +1,6 @@
 import { Label, TransactionType } from "../../../generated/prisma";
 import prisma from "../../libs/prisma";
+import { SpendingCategoryDtoType } from "./dtos/spending.category.dto";
 
 export async function detectCategoryByKeyword(
   title: string,
@@ -22,6 +23,42 @@ export async function detectCategoryByKeyword(
 
   return null;
 }
+
+/**
+ * Returns all user's labels with total distribution (percentage/BRL)
+ */
+export const getSpendingCategoryDistribution = async (
+  userId: string,
+  month: number,
+  year: number
+) => {
+  try {
+    const result = (await prisma.$queryRaw`
+SELECT
+  l."title",
+  l."colorHex",
+  COALESCE(SUM(t."valueBrl"), 0) AS "valueBrl",
+  COALESCE(ROUND(100.0 * SUM(t."valueBrl") / SUM(SUM(t."valueBrl")) OVER (), 2), 0) as "percentage"
+FROM
+  public."Label" l
+INNER JOIN
+  public."Transaction" t
+  ON t."labelId" = l."id"
+  AND EXTRACT(YEAR FROM t."occurredAt") = ${year}
+  AND EXTRACT(MONTH FROM t."occurredAt") = ${month}
+  AND l."userId" = ${userId}
+GROUP BY
+  l."id", l."title", l."colorHex"
+ORDER BY
+  "valueBrl" DESC
+LIMIT 10;`) as SpendingCategoryDtoType[];
+
+    return result;
+  } catch (error) {
+    console.error("[getLabels] Error:", error);
+    throw new Error("Could not fetch Labels");
+  }
+};
 
 /**
  * Returns all user's labels

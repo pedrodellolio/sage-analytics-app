@@ -8,9 +8,13 @@ import { CreateTransactionDto } from "./dtos/create-transaction.dto";
 import { importTransactions } from "./transaction.import";
 import { upload } from "../../libs/multer";
 import { UpdateTransactionCategoryDto } from "./dtos/update-transaction-category.dto";
+import z from "zod";
+import { validate } from "../../middlewares/validate";
 
 const transactionRouter = Router();
-
+const querySchema = z.object({
+  limit: z.string().regex(/^\d+$/).transform(Number),
+});
 /**
  * Get user's transactions
  * @auth required
@@ -18,10 +22,14 @@ const transactionRouter = Router();
  */
 transactionRouter.get(
   "/",
+  validate(querySchema, "query"),
   async (req: Request, res: Response, next: NextFunction) => {
     try {
+      const { limit } = (req as any).validated.query as {
+        limit: number;
+      };
       const user = (req as any).user; // injected by Passport after authentication
-      const transactions = await getTransactions(user.id);
+      const transactions = await getTransactions(user.id, limit);
       res.status(200).json(transactions);
     } catch (err) {
       console.error("Error:", err);

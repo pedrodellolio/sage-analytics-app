@@ -7,12 +7,13 @@ import { CreateTransactionDtoType } from "./dtos/create-transaction.dto";
 /**
  * Returns all user's transactions
  */
-export const getTransactions = async (userId: string) => {
+export const getTransactions = async (userId: string, limit: number = 0) => {
   try {
     return await prisma.transaction.findMany({
       where: { wallet: { userId } },
       orderBy: { occurredAt: "desc" },
       include: { label: true },
+      ...(limit > 0 && { take: limit }),
     });
   } catch (error) {
     console.error("[getTransactions] Error:", error);

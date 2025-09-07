@@ -40,7 +40,7 @@ export const importTransactions = async (
           .pipe(csv())
           .on("data", async (row: Record<string, string>) => {
             const parsed = await parser(row, user.id);
-            transactions.push(parsed);
+            parsed && transactions.push(parsed);
           })
           .on("end", resolve)
           .on("error", reject);

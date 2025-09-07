@@ -55,7 +55,7 @@ export const postWallet = async ({
   userId: string;
 }) => {
   try {
-    return prisma.wallet.create({
+    return await prisma.wallet.create({
       data: {
         month,
         year,

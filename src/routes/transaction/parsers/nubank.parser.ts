@@ -14,11 +14,15 @@ type ParsedNubankRow = {
   amount: number;
 };
 
+const TRANSACTIONS_TO_IGNORE = ["Pagamento recebido"];
+
 export async function parseNubankTransactionRow(
   row: Record<string, string>,
   userId: string
-): Promise<CreateTransactionDtoType> {
+): Promise<CreateTransactionDtoType | undefined> {
   const parsed = parseCommonNubankRow(row);
+
+  if (TRANSACTIONS_TO_IGNORE.includes(parsed.title.trim())) return;
 
   const category = await detectCategoryByKeyword(parsed.title, userId);
   const mappedTransaction: CreateTransactionDtoType = {

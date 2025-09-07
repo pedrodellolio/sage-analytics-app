@@ -28,8 +28,8 @@ export const updateTransactionCategory = async (
   transactionId: string,
   categoryId: string
 ) => {
-  prisma.$transaction(async (tx) => {
-    const transaction = await prisma.transaction.update({
+  return await prisma.$transaction(async (tx) => {
+    const transaction = await tx.transaction.update({
       data: {
         labelId: categoryId,
       },
@@ -61,7 +61,7 @@ export const postTransaction = async (params: {
   occurredAt: Date;
   userId: string;
 }) => {
-  return prisma.$transaction((tx) => _createOneTransaction(params));
+  return await prisma.$transaction((tx) => _createOneTransaction(params));
 };
 
 /**
@@ -71,7 +71,7 @@ export const processTransactions = async (
   transactions: CreateTransactionDtoType[],
   userId: string
 ) => {
-  return prisma.$transaction(async (tx) => {
+  return await prisma.$transaction(async (tx) => {
     const createdTxns = [];
     for (const transaction of transactions) {
       const txn = await _createOneTransaction({

@@ -83,7 +83,7 @@ export const postLabel = async (
   colorHex: string,
   userId: string
 ) => {
-  return prisma.label.create({
+  return await prisma.label.create({
     data: { title, colorHex, userId },
   });
 };
@@ -96,7 +96,7 @@ export const updateLabel = async (
   colorHex: string,
   userId: string
 ) => {
-  return prisma.label.update({
+  return await prisma.label.update({
     where: { title, userId },
     data: { title, colorHex },
   });

@@ -19,7 +19,9 @@ export const postCategoryKeyword = async (
     throw new Error("Category not found or does not belong to the user");
   }
 
-  return prisma.labelKeywords.create({
-    data: { keyword, labelId: categoryId },
+  await prisma.labelKeywords.upsert({
+    where: { keyword },
+    update: { labelId: categoryId },
+    create: { keyword, labelId: categoryId },
   });
 };
